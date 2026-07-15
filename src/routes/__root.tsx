@@ -85,13 +85,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "A minimal, modern fitness tracker. Log daily workouts, track calories burned, and visualize your weekly progress.",
       },
-      { property: "og:title", content: "FitTrack Pro" },
+      { property: "og:title", content: "FitTrack Pro — Log workouts, track calories, see progress" },
       {
         property: "og:description",
-        content: "Log daily workouts, track calories burned, and see your weekly progress.",
+        content: "A minimal, modern fitness tracker. Log daily workouts, track calories burned, and visualize your weekly progress.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "FitTrack Pro — Log workouts, track calories, see progress" },
+      { name: "twitter:description", content: "A minimal, modern fitness tracker. Log daily workouts, track calories burned, and visualize your weekly progress." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1bf54f0c-74a6-414c-85b6-44de0ed22f86/id-preview-07cbcb7d--aed85ba0-7be4-4b86-b31e-0009a71002e3.lovable.app-1784135367385.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1bf54f0c-74a6-414c-85b6-44de0ed22f86/id-preview-07cbcb7d--aed85ba0-7be4-4b86-b31e-0009a71002e3.lovable.app-1784135367385.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
