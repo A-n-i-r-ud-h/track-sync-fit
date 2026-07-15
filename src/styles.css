@@ -41,59 +41,96 @@
 }
 
 /*
- * FitTrack Pro — dark canvas + electric lime accent.
+ * FitTrack Pro — dark canvas + electric coral/violet accent.
  */
 :root {
-  --radius: 0.75rem;
+  --radius: 0.9rem;
 
-  --background: oklch(0.16 0.02 250);
-  --foreground: oklch(0.98 0.005 250);
+  --background: oklch(0.15 0.025 285);
+  --foreground: oklch(0.98 0.005 285);
 
-  --card: oklch(0.21 0.02 250);
-  --card-foreground: oklch(0.98 0.005 250);
+  --card: oklch(0.2 0.03 285);
+  --card-foreground: oklch(0.98 0.005 285);
 
-  --popover: oklch(0.21 0.02 250);
-  --popover-foreground: oklch(0.98 0.005 250);
+  --popover: oklch(0.2 0.03 285);
+  --popover-foreground: oklch(0.98 0.005 285);
 
-  --primary: oklch(0.87 0.22 130);
-  --primary-foreground: oklch(0.18 0.03 250);
+  --primary: oklch(0.7 0.25 15);
+  --primary-foreground: oklch(0.99 0.005 285);
 
-  --secondary: oklch(0.26 0.02 250);
-  --secondary-foreground: oklch(0.98 0.005 250);
+  --secondary: oklch(0.26 0.04 285);
+  --secondary-foreground: oklch(0.98 0.005 285);
 
-  --muted: oklch(0.24 0.02 250);
-  --muted-foreground: oklch(0.7 0.02 250);
+  --muted: oklch(0.23 0.03 285);
+  --muted-foreground: oklch(0.72 0.02 285);
 
-  --accent: oklch(0.28 0.05 160);
-  --accent-foreground: oklch(0.98 0.005 250);
+  --accent: oklch(0.3 0.08 320);
+  --accent-foreground: oklch(0.98 0.005 285);
 
   --destructive: oklch(0.65 0.22 25);
-  --destructive-foreground: oklch(0.98 0.005 250);
+  --destructive-foreground: oklch(0.98 0.005 285);
 
-  --border: oklch(0.28 0.02 250);
-  --input: oklch(0.28 0.02 250);
-  --ring: oklch(0.87 0.22 130);
+  --border: oklch(0.28 0.03 285);
+  --input: oklch(0.28 0.03 285);
+  --ring: oklch(0.7 0.25 15);
 
-  --chart-1: oklch(0.87 0.22 130);
-  --chart-2: oklch(0.7 0.18 180);
-  --chart-3: oklch(0.65 0.2 260);
-  --chart-4: oklch(0.75 0.18 60);
-  --chart-5: oklch(0.65 0.22 20);
+  --chart-1: oklch(0.7 0.25 15);
+  --chart-2: oklch(0.68 0.22 320);
+  --chart-3: oklch(0.7 0.2 260);
+  --chart-4: oklch(0.78 0.18 55);
+  --chart-5: oklch(0.72 0.2 190);
 
   --gradient-hero: radial-gradient(
-      ellipse 80% 60% at 50% -10%,
+      ellipse 60% 50% at 85% 0%,
+      color-mix(in oklab, oklch(0.68 0.22 320) 28%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 55% 45% at 10% 90%,
       color-mix(in oklab, var(--primary) 22%, transparent),
       transparent 60%
     ),
-    linear-gradient(180deg, oklch(0.18 0.03 250), oklch(0.14 0.02 250));
+    linear-gradient(180deg, oklch(0.17 0.03 285), oklch(0.13 0.025 285));
   --gradient-accent: linear-gradient(
     135deg,
     var(--primary),
-    oklch(0.8 0.2 170)
+    oklch(0.68 0.22 320)
   );
-  --shadow-glow: 0 20px 60px -20px color-mix(in oklab, var(--primary) 45%, transparent);
-  --shadow-card: 0 10px 30px -12px oklch(0 0 0 / 0.5);
+  --shadow-glow: 0 30px 80px -20px color-mix(in oklab, var(--primary) 55%, transparent);
+  --shadow-card: 0 10px 30px -12px oklch(0 0 0 / 0.55);
 }
+
+@keyframes float-slow {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); }
+  50% { transform: translate3d(0,-18px,0) scale(1.05); }
+}
+@keyframes drift {
+  0%, 100% { transform: translate3d(0,0,0); }
+  50% { transform: translate3d(20px,-10px,0); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 55%, transparent); }
+  70% { box-shadow: 0 0 0 14px color-mix(in oklab, var(--primary) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bar-grow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+@utility animate-float { animation: float-slow 8s ease-in-out infinite; }
+@utility animate-drift { animation: drift 10s ease-in-out infinite; }
+@utility animate-pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
+@utility animate-rise { animation: rise 0.7s cubic-bezier(.2,.7,.2,1) both; }
+@utility animate-bar { animation: bar-grow 0.9s cubic-bezier(.2,.7,.2,1) both; transform-origin: bottom; }
 
 .dark {
   color-scheme: dark;
