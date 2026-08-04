@@ -13,11 +13,13 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>) => ({
-    next: typeof s.next === "string" && s.next.startsWith("/") && !s.next.startsWith("//")
-      ? s.next
-      : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>): { next?: string } => {
+    const next = s.next;
+    if (typeof next === "string" && next.startsWith("/") && !next.startsWith("//")) {
+      return { next };
+    }
+    return {};
+  },
   component: AuthPage,
 });
 
