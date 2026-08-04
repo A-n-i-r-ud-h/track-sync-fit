@@ -72,6 +72,7 @@ function WorkoutsPage() {
       if (error) throw error;
     },
     onSuccess: () => {
+      trackEvent("workout_logged");
       toast.success("Workout logged");
       setName("");
       setDuration("");
