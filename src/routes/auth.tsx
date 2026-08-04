@@ -49,6 +49,7 @@ function AuthPage() {
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
+        trackEvent("sign_up", { method: "email" });
         toast.success("Account created. You're in.");
       } else {
         const { error } = await supabase.auth.signInWithPassword(parsed.data);
