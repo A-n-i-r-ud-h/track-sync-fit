@@ -57,9 +57,7 @@ function Landing() {
             <h1 className="font-display text-5xl font-semibold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
               Track workouts.
               <br />
-              <span className="bg-accent-gradient bg-clip-text text-transparent">
-                Own your progress.
-              </span>
+              <span className="text-primary">Own your progress.</span>
             </h1>
             <p className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
               A no-nonsense fitness tracker. Log a workout in seconds, watch calories add up,
