@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://xyfnlqnyslztuohcpjyd.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "fittrack-simple",
+      "version": "0.1.0",
+      "title": "FitTrack Simple"
+    },
+    "tools": [
+      {
+        "name": "list_workouts",
+        "title": "List workouts",
+        "description": "List the signed-in user's logged workouts, newest first. Optionally filter by date range.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "from": {
+              "description": "Earliest workout date, ISO format YYYY-MM-DD.",
+              "type": "string"
+            },
+            "to": {
+              "description": "Latest workout date, ISO format YYYY-MM-DD.",
+              "type": "string"
+            },
+            "limit": {
+              "description": "Max rows (default 50).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "log_workout",
+        "title": "Log workout",
+        "description": "Log a workout for the signed-in user: exercise name, duration in minutes, calories burned and the date.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "description": "Exercise name, e.g. Running."
+            },
+            "duration_minutes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1440,
+              "description": "Duration in minutes."
+            },
+            "calories": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20000,
+              "description": "Calories burned."
+            },
+            "workout_date": {
+              "description": "Workout date, ISO format YYYY-MM-DD. Defaults to today.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "duration_minutes",
+            "calories"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "delete_workout",
+        "title": "Delete workout",
+        "description": "Delete one of the signed-in user's workouts by its id.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "Workout id to delete."
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "workout_summary",
+        "title": "Workout summary",
+        "description": "Summarise the signed-in user's training over the last N days: total workouts, minutes and calories.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "days": {
+              "description": "Look-back window in days (default 7).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 365
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
