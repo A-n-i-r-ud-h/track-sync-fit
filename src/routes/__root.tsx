@@ -120,7 +120,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     scripts: [
       { src: `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`, async: true },
       {
-        children: `window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){window.dataLayer.push(arguments);};gtag('js',new Date());gtag('config','${GA_ID}',{send_page_view:true});`,
+        children: `window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){window.dataLayer.push(arguments);};gtag('js',new Date());gtag('config','${GA_ID}',{send_page_view:false});`,
       },
     ],
   }),
