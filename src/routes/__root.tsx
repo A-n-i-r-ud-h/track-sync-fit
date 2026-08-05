@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { trackPageView } from "@/lib/analytics";
 
 const GA_ID = "G-GKBTYR36M5";
 
@@ -120,7 +121,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     scripts: [
       { src: `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`, async: true },
       {
-        children: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`,
+        children: `window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){window.dataLayer.push(arguments);};gtag('js',new Date());gtag('config','${GA_ID}',{send_page_view:false});`,
       },
     ],
   }),
@@ -150,7 +151,7 @@ function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
-    window.gtag?.("event", "page_view", { page_path: pathname });
+    trackPageView(pathname);
   }, [pathname]);
 
 
