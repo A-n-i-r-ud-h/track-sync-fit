@@ -150,7 +150,7 @@ function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
-    window.gtag?.("event", "page_view", { page_path: pathname });
+    trackPageView(pathname);
   }, [pathname]);
 
 
