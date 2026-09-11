@@ -130,16 +130,36 @@ function Dashboard() {
         </Link>
       </div>
 
+      {isError && (
+        <Card className="mb-6 border-destructive/40 bg-card p-4 shadow-card">
+          <p className="text-sm text-foreground">
+            We couldn't load your workouts.{" "}
+            <span className="text-muted-foreground">
+              {error instanceof Error ? error.message : ""}
+            </span>
+          </p>
+          <Button size="sm" variant="outline" className="mt-3" onClick={() => refetch()}>
+            {isFetching ? "Retrying…" : "Try again"}
+          </Button>
+        </Card>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-3">
         {stats.map((s) => (
-          <Card key={s.label} className="border-border bg-card p-5 shadow-card">
+          <Card key={s.label} className="border-border bg-card p-5 shadow-card transition-transform hover:-translate-y-0.5">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">{s.label}</span>
               <s.icon className="h-4 w-4 text-primary" />
             </div>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="font-display text-3xl font-semibold">{s.value}</span>
-              <span className="text-xs text-muted-foreground">{s.suffix}</span>
+              {isLoading ? (
+                <Skeleton className="h-9 w-20" />
+              ) : (
+                <>
+                  <span className="font-display text-3xl font-semibold">{s.value}</span>
+                  <span className="text-xs text-muted-foreground">{s.suffix}</span>
+                </>
+              )}
             </div>
           </Card>
         ))}
@@ -192,7 +212,17 @@ function Dashboard() {
       <Card className="mt-6 border-border bg-card p-6 shadow-card">
         <h2 className="font-display text-lg font-semibold">Recent workouts</h2>
         {isLoading ? (
-          <p className="mt-4 text-sm text-muted-foreground">Loading…</p>
+          <div className="mt-4 space-y-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="flex items-center justify-between gap-4">
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+                <Skeleton className="h-4 w-16" />
+              </div>
+            ))}
+          </div>
         ) : workouts.length === 0 ? (
           <div className="mt-6 rounded-lg border border-dashed border-border p-8 text-center">
             <p className="text-sm text-muted-foreground">
