@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Activity } from "lucide-react";
+import { Activity, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -13,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 
 export const Route = createFileRoute("/auth")({
+  ssr: false,
   validateSearch: (s: Record<string, unknown>): { next?: string } => {
     const next = s.next;
     if (typeof next === "string" && next.startsWith("/") && !next.startsWith("//")) {
@@ -28,15 +30,28 @@ const credsSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters").max(72),
 });
 
+function friendly(message: string) {
+  const m = message.toLowerCase();
+  if (m.includes("invalid login credentials")) return "That email and password don't match.";
+  if (m.includes("already registered") || m.includes("user already"))
+    return "That email already has an account — sign in instead.";
+  if (m.includes("email not confirmed")) return "Confirm your email first, then sign in.";
+  return message;
+}
+
 function AuthPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { next } = Route.useSearch();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   const goAfterAuth = () => {
+    queryClient.removeQueries({ queryKey: ["profile"] });
     if (next) {
       window.location.href = next;
       return;
@@ -45,11 +60,17 @@ function AuthPage() {
   };
 
   useEffect(() => {
+    let active = true;
     supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
       if (data.session) goAfterAuth();
+      else setChecking(false);
     });
+    return () => {
+      active = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate, next]);
+  }, [next]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,29 +79,41 @@ function AuthPage() {
       toast.error(parsed.error.issues[0].message);
       return;
     }
+    if (mode === "signup" && fullName.trim().length < 2) {
+      toast.error("Tell us your name so we can personalize your dashboard");
+      return;
+    }
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: parsed.data.email,
           password: parsed.data.password,
           options: {
+            data: { display_name: fullName.trim(), full_name: fullName.trim() },
             emailRedirectTo: next
               ? `${window.location.origin}${next}`
-              : window.location.origin,
+              : `${window.location.origin}/dashboard`,
           },
         });
         if (error) throw error;
         await trackEventAndWait("sign_up", { method: "email" });
-        toast.success("Account created. You're in.");
+
+        if (!data.session) {
+          toast.success("Check your inbox to confirm your email, then sign in.");
+          setMode("signin");
+          setPassword("");
+          setLoading(false);
+          return;
+        }
+        toast.success(`Welcome, ${fullName.trim().split(" ")[0]}!`);
       } else {
         const { error } = await supabase.auth.signInWithPassword(parsed.data);
         if (error) throw error;
       }
       goAfterAuth();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
+      toast.error(friendly(err instanceof Error ? err.message : "Something went wrong"));
       setLoading(false);
     }
   };
@@ -88,9 +121,7 @@ function AuthPage() {
   const google = async () => {
     setLoading(true);
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: next
-        ? `${window.location.origin}${next}`
-        : window.location.origin,
+      redirect_uri: window.location.origin,
     });
     if (result.error) {
       toast.error(result.error.message ?? "Google sign-in failed");
@@ -101,9 +132,17 @@ function AuthPage() {
     goAfterAuth();
   };
 
+  if (checking) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-hero">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
-    <div className="grid min-h-screen place-items-center bg-hero px-4">
-      <div className="w-full max-w-md">
+    <div className="grid min-h-screen place-items-center bg-hero px-4 py-10">
+      <div className="w-full max-w-md animate-rise">
         <Link
           to="/"
           className="mb-6 flex items-center justify-center gap-2 font-display text-lg font-semibold"
@@ -146,6 +185,20 @@ function AuthPage() {
           </div>
 
           <form onSubmit={submit} className="space-y-4">
+            {mode === "signup" && (
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Your name</Label>
+                <Input
+                  id="fullName"
+                  autoComplete="name"
+                  placeholder="Alex Carter"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  maxLength={80}
+                  required
+                />
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -174,7 +227,16 @@ function AuthPage() {
               className="w-full bg-primary text-primary-foreground hover:opacity-90"
               disabled={loading}
             >
-              {loading ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Please wait…
+                </>
+              ) : mode === "signin" ? (
+                "Sign in"
+              ) : (
+                "Create account"
+              )}
             </Button>
           </form>
 
