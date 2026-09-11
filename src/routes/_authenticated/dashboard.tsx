@@ -110,8 +110,10 @@ function Dashboard() {
   return (
     <AppShell>
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-display text-3xl font-semibold">Today</h1>
+        <div className="animate-rise">
+          <h1 className="font-display text-3xl font-semibold">
+            {greeting()}, {firstNameOf(profile?.display_name, profile?.email)}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {new Date().toLocaleDateString(undefined, {
               weekday: "long",
