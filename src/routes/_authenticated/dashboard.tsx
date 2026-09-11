@@ -15,6 +15,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useProfile, firstNameOf } from "@/hooks/useProfile";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -45,9 +47,18 @@ function last7Days(): string[] {
   return days;
 }
 
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 18) return "Good afternoon";
+  return "Good evening";
+}
+
 function Dashboard() {
-  const { data, isLoading } = useQuery({
+  const { data: profile } = useProfile();
+  const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ["workouts", "recent"],
+    staleTime: 30_000,
     queryFn: async () => {
       const start = last7Days()[0];
       const { data, error } = await supabase
